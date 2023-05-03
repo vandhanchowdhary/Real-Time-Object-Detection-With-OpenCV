@@ -52,16 +52,6 @@ while True:
 	(h, w) = frame.shape[:2]
 	# Resize each frame
 	resized_image = cv2.resize(frame, (300, 300))
-	# Creating the blob
-	# The function:
-	# blob = cv2.dnn.blobFromImage(image, scalefactor=1.0, size, mean, swapRB=True)
-	# image: the input image we want to preprocess before passing it through our deep neural network for classification
-	# mean:
-	# scalefactor: After we perform mean subtraction we can optionally scale our images by some factor. Default = 1.0
-	# scalefactor  should be 1/sigma as we're actually multiplying the input channels (after mean subtraction) by scalefactor (Here 1/127.5)
-	# swapRB : OpenCV assumes images are in BGR channel order; however, the 'mean' value assumes we are using RGB order.
-	# To resolve this discrepancy we can swap the R and B channels in image  by setting this value to 'True'
-	# By default OpenCV performs this channel swapping for us.
 
 	blob = cv2.dnn.blobFromImage(resized_image, (1/127.5), (300, 300), 127.5, swapRB=True)
 	# print(blob.shape) # (1, 3, 300, 300)
@@ -102,30 +92,6 @@ while True:
 	# show the output frame
 	cv2.imshow("Frame", frame)
 
-	# HOW TO STOP THE VIDEOSTREAM?
-	# Using cv2.waitKey(1) & 0xFF
-
-	# The waitKey(0) function returns -1 when no input is made
-	# As soon an event occurs i.e. when a button is pressed, it returns a 32-bit integer
-	# 0xFF represents 11111111, an 8 bit binary
-	# since we only require 8 bits to represent a character we AND waitKey(0) to 0xFF, an integer below 255 is always obtained
-	# ord(char) returns the ASCII value of the character which would be again maximum 255
-	# by comparing the integer to the ord(char) value, we can check for a key pressed event and break the loop
-	# ord("q") is 113. So once 'q' is pressed, we can write the code to break the loop
-	# Case 1: When no button is pressed: cv2.waitKey(1) is -1; 0xFF = 255; So -1 & 255 gives 255
-	# Case 2: When 'q' is pressed: ord("q") is 113; 0xFF = 255; So 113 & 255 gives 113
-
-	# Explaining bitwise AND Operator ('&'):
-	# The & operator yields the bitwise AND of its arguments
-	# First you convert the numbers to binary and then do a bitwise AND operation
-	# For example, (113 & 255):
-	# Binary of 113: 01110001
-	# Binary of 255: 11111111
-	# 113 & 255 = 01110001 (From the left, 1&1 gives 1, 0&1 gives 0, 0&1 gives 0,... etc.)
-	# 01110001 is the decimal for 113, which will be the output
-	# So we will basically get the ord() of the key we press if we do a bitwise AND with 255.
-	# ord() returns the unicode code point of the character. For e.g., ord('a') = 97; ord('q') = 113
-
 	# Now, let's code this logic (just 3 lines, lol)
 	key = cv2.waitKey(1) & 0xFF
 
@@ -147,6 +113,3 @@ print("[INFO] Approximate FPS: {:.2f}".format(fps.fps()))
 cv2.destroyAllWindows()
 # Stop the video stream
 vs.stop()
-
-# In case you removed the opaque tape over your laptop cam, make sure you put them back on once finished ;)
-# YAYYYYYYYYYY WE ARE DONE!

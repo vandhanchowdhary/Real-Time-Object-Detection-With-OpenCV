@@ -12,30 +12,11 @@ import cv2
 
 # construct the argument parse and parse the arguments
 ap = argparse.ArgumentParser()
-ap.add_argument("-p", "--prototxt", required=True,
-	help="path to Caffe 'deploy' prototxt file")
-ap.add_argument("-m", "--model", required=True,
-	help="path to Caffe pre-trained model")
-ap.add_argument("-c", "--confidence", type=float, default=0.2,
-	help="minimum probability to filter weak predictions")
+ap.add_argument("-p", "--prototxt", required=True, help="path to Caffe 'deploy' prototxt file")
+ap.add_argument("-m", "--model", required=True,	help="path to Caffe pre-trained model")
+ap.add_argument("-c", "--confidence", type=float, default=0.2, help="minimum probability to filter weak predictions")
 args = vars(ap.parse_args())
 
-# Arguments used here:
-# prototxt = MobileNetSSD_deploy.prototxt.txt (required)
-# model = MobileNetSSD_deploy.caffemodel (required)
-# confidence = 0.2 (default)
-
-# SSD (Single Shot MultiBox Detector) is a popular algorithm in object detection
-# It has no delegated region proposal network and predicts the boundary boxes and the classes directly from feature maps in one single pass
-# To improve accuracy, SSD introduces: small convolutional filters to predict object classes and offsets to default boundary boxes
-# Mobilenet is a convolution neural network used to produce high-level features
-
-# SSD is designed for object detection in real-time
-# The SSD object detection composes of 2 parts: Extract feature maps, and apply convolution filters to detect objects
-
-# Let's start by initialising the list of the 21 class labels MobileNet SSD was trained to.
-# Each prediction composes of a boundary box and 21 scores for each class (one extra class for no object),
-# and we pick the highest score as the class for the bounded object
 CLASSES = ["aeroplane", "background", "bicycle", "bird", "boat",
            "bottle", "bus", "car", "cat", "chair", "cow", "diningtable",
            "dog", "horse", "motorbike", "person", "pottedplant", "sheep",
@@ -44,15 +25,8 @@ CLASSES = ["aeroplane", "background", "bicycle", "bird", "boat",
 # Assigning random colors to each of the classes
 COLORS = np.random.uniform(0, 255, size=(len(CLASSES), 3))
 
-# COLORS: a list of 21 R,G,B values, like ['101.097383   172.34857188 111.84805346'] for each label
-# length of COLORS = length of CLASSES = 21
-
-# load our serialized model
-# The model from Caffe: MobileNetSSD_deploy.prototxt.txt; MobileNetSSD_deploy.caffemodel;
 print("[INFO] loading model...")
 net = cv2.dnn.readNetFromCaffe(args["prototxt"], args["model"])
-# print(net)
-# <dnn_Net 0x128ce1310>
 
 # initialize the video stream,
 # and initialize the FPS counter
@@ -64,29 +38,6 @@ time.sleep(2.0)
 # FPS: used to compute the (approximate) frames per second
 # Start the FPS timer
 fps = FPS().start()
-
-# OpenCV provides two functions to facilitate image preprocessing for deep learning classification: cv2.dnn.blobFromImage and cv2.dnn.blobFromImages. Here we will use cv2.dnn.blobFromImage
-# These two functions perform: Mean subtraction, Scaling, and optionally channel swapping
-
-# Mean subtraction is used to help combat illumination changes in the input images in our dataset. We can therefore view mean subtraction as a technique used to aid our Convolutional Neural Networks
-# Before we even begin training our deep neural network, we first compute the average pixel intensity across all images in the training set for each of the Red, Green, and Blue channels.
-# we end up with three variables: mu_R, mu_G, and mu_B (3-tuple consisting of the mean of the Red, Green, and Blue channels)
-# For example, the mean values for the ImageNet training set are R=103.93, G=116.77, and B=123.68
-# When we are ready to pass an image through our network (whether for training or testing), we subtract the mean, \mu, from each input channel of the input image:
-# R = R - mu_R
-# G = G - mu_G
-# B = B - mu_B
-
-# We may also have a scaling factor, \sigma, which adds in a normalization:
-# R = (R - mu_R) / sigma
-# G = (G - mu_G) / sigma
-# B = (B - mu_B) / sigma
-
-# The value of \sigma may be the standard deviation across the training set (thereby turning the preprocessing step into a standard score/z-score)
-# sigma may also be manually set (versus calculated) to scale the input image space into a particular range — it really depends on the architecture, how the network was trained
-
-# cv2.dnn.blobFromImage creates 4-dimensional blob from image. Optionally resizes and crops image from center, subtract mean values, scales values by scalefactor, swap Blue and Red channels
-# a blob is just an image(s) with the same spatial dimensions (width and height), same depth (number of channels), that have all be preprocessed in the same manner
 
 # Consider the video stream as a series of frames. We capture each frame based on a certain FPS, and loop over each frame
 # loop over the frames from the video stream
